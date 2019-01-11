@@ -3,7 +3,7 @@
 
 ## Next.jsのインストール
 最近では`create-next-app`(`create-react-app`ライクなコマンド一発で`Next.js`の環境を構築できる便利なツール)が開発されたことにより、簡単に環境構築することができます。  
-```sh
+```
 npm install -g create-next-app
 create-next-app sample-app
 cd sample-app
@@ -11,7 +11,7 @@ npm run dev
 ```
 
 `--example サンプル名`のオプションを付与することで、用途に応じた雛形を用意することもできます。例えば、Next.jsでReduxを使用したい場合、下記のように指定することで、Reduxのサンプルプロジェクトが生成されます。
-```sh
+```
 create-next-app --example with-redux sample-redux-app
 ```
 【参考URL】
@@ -21,7 +21,7 @@ create-next-app --example with-redux sample-redux-app
 
 今回は、`create-next-app`を使用せずに進めていきましょう。
 
-```sh
+```
 mkdir next-js-app
 cd next-js-app
 npm init
@@ -32,7 +32,7 @@ npm install react@latest react-dom@latest --save
 ```
 
 プロジェクトをgit管理する場合は、下記のファイル・ディレクトリを`.gitignore`しましょう。
-```.gitignore
+```
 .DS_Store
 .idea
 .next
@@ -47,7 +47,7 @@ yarn-error*
 
 ## development環境でNext.jsアプリケーションを実行しよう
 `package.json`に下記を追記しましょう。
-```json
+```
 {
   "scripts": {
     "start": "next"
@@ -55,7 +55,7 @@ yarn-error*
 }
 ```
 
-```sh
+```
 npm start
 ```
 
@@ -63,7 +63,7 @@ npm start
 
 ## 最初のNext.jsページを作ろう
 `pages`ディレクトリ以下に簡単なコンポーネントを作成しましょう。
-```js
+```
 // pages/index.js
 import React from "react";
 export default () => (<div>Hello, world!</div>);
