@@ -156,7 +156,8 @@ export default () => (<div><Link href="/another"><a>Another</a></Link></div>);
 
 続いて、2つのページで共通して使用するNavigationコンポーネントを作成し、ページ間の行き来をできるようにしましょう。
 
-1. 現在のURLに応じて文字の太さが変化するコンポーネントを作成
+1. 現在のURLに応じて文字の太さが変化するコンポーネントを作成  
+
 
 ```js
 // components/Btn.js
@@ -174,7 +175,9 @@ const Btn = ({href, onClick, children, router}) => (
 export default withRouter(Btn)
 ```
 
-2. `Navigation`コンポーネントの作成
+2. `Navigation`コンポーネントの作成  
+
+
 ```js
 // components/Navigation.js
 import React from "react";
@@ -189,7 +192,9 @@ export default () => (
 );
 ```
 
-3. 各ページにNavigationコンポーネントを設置します。
+3. 各ページにNavigationコンポーネントを設置します。  
+
+
 ```js
 // pages/index.js
 import React from "react";
@@ -228,7 +233,8 @@ export default () => (
 実際のWebアプリケーションはページとURLが1対1に対応しているわけではなく、idやタイトルに応じてコンテンツが変化します。
 ここでは、ダイナミックルーティングについて学んでいきましょう。
 
-1. ダイナミックルーティングに使用するデータファイルを定義します
+1. ダイナミックルーティングに使用するデータファイルを定義します  
+
 
 ```js
 // data/posts.js
@@ -239,7 +245,8 @@ export default [
 ];
 ```
 
-2. `index.js`に上記のページに対応する`Link`を記述します
+2. `index.js`に上記のページに対応する`Link`を記述します  
+
 
 ```js
 // pages/index.js
@@ -264,7 +271,8 @@ export default () => (
 ```
 Next.jsでは、Linkにオブジェクトを渡すことで、自動でStringに変換してくれます。
 
-3. `another.js`でページのタイトルを表示するようにします
+3. `another.js`でページのタイトルを表示するようにします  
+
 
 ```js
 // pages/another.js
@@ -287,6 +295,7 @@ anotherページに`title`が表示されるはずです。
 
 4. `posts[id]`が未定義の場合はエラーページを表示するようにする
 `posts[id]`が未定義の場合、三項演算子を使ってシンプルにNext.jsが用意している`Error`コンポーネントを表示しましょう。
+
 ```js
 import React from "react";
 import Error from "next/error";
