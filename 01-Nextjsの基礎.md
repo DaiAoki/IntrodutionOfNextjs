@@ -477,6 +477,7 @@ module.exports = withCss({});
 ```
 
 3. カスタムドキュメントの追加
+＊カスタムドキュメントについては2章で詳しく説明します。ここでは、`css`の部分に着目してください。
 ```
 // pages/_document.js
 import Document, {Head, Main, NextScript} from 'next/document';
