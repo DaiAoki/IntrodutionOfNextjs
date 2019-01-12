@@ -157,6 +157,7 @@ export default () => (<div><Link href="/another"><a>Another</a></Link></div>);
 続いて、2つのページで共通して使用するNavigationコンポーネントを作成し、ページ間の行き来をできるようにしましょう。
 
 1. 現在のURLに応じて文字の太さが変化するコンポーネントを作成
+
 ```js
 // components/Btn.js
 import React from "react";
@@ -202,6 +203,8 @@ export default () => (
   </div>
 );
 ```
+
+`another.js`でNavigationコンポーネントをimportし、renderします。
 
 ```js
 // pages/another.js
@@ -516,6 +519,8 @@ export default () => (
   </nav>
 );
 ```
+
+`Navigation.css`では変化がわかりやすく`background-color`を指定しましょう。
 
 ```css
 // pages/Navigation.css
