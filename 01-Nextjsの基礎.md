@@ -229,6 +229,7 @@ export default () => (
 ここでは、ダイナミックルーティングについて学んでいきましょう。
 
 1. ダイナミックルーティングに使用するデータファイルを定義します
+
 ```js
 // data/posts.js
 export default [
@@ -239,6 +240,7 @@ export default [
 ```
 
 2. `index.js`に上記のページに対応する`Link`を記述します
+
 ```js
 // pages/index.js
 import React from "react";
@@ -263,6 +265,7 @@ export default () => (
 Next.jsでは、Linkにオブジェクトを渡すことで、自動でStringに変換してくれます。
 
 3. `another.js`でページのタイトルを表示するようにします
+
 ```js
 // pages/another.js
 import React from "react";
