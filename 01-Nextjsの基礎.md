@@ -3,7 +3,7 @@
 
 ## Next.jsのインストール
 最近では`create-next-app`(`create-react-app`ライクなコマンド一発で`Next.js`の環境を構築できる便利なツール)が開発されたことにより、簡単に環境構築することができます。  
-```
+```bash
 npm install -g create-next-app
 create-next-app sample-app
 cd sample-app
@@ -11,7 +11,7 @@ npm run dev
 ```
 
 `--example サンプル名`のオプションを付与することで、用途に応じた雛形を用意することもできます。例えば、Next.jsでReduxを使用したい場合、下記のように指定することで、Reduxのサンプルプロジェクトが生成されます。
-```
+```bash
 create-next-app --example with-redux sample-redux-app
 ```
 【参考URL】
@@ -21,7 +21,7 @@ create-next-app --example with-redux sample-redux-app
 
 今回は、`create-next-app`を使用せずに進めていきましょう。
 
-```
+```bash
 mkdir next-js-app
 cd next-js-app
 npm init
@@ -33,7 +33,7 @@ npm install next --save
 ```
 
 プロジェクトをgit管理する場合は、下記のファイル・ディレクトリを`.gitignore`しましょう。
-```
+```bash
 .DS_Store
 .idea
 .next
@@ -48,7 +48,7 @@ yarn-error*
 
 ## development環境でNext.jsアプリケーションを実行しよう
 `package.json`に下記を追記しましょう。
-```
+```json
 {
   "scripts": {
     "start": "next"
@@ -57,7 +57,7 @@ yarn-error*
 ```
 
 pagesディレクトリを作成して、`npm start`します。
-```
+```bash
 mkdir pages
 npm start
 ```
@@ -68,7 +68,7 @@ npm start
 
 ## Next.jsのHello, world!
 `pages`ディレクトリ以下に簡単なコンポーネントを作成しましょう。
-```
+```js
 // pages/index.js
 import React from "react";
 export default () => (<div>Hello, world!</div>);
@@ -82,7 +82,7 @@ Next.jsを使用して本番運用するにあたって、静的なWebサイト�
 
 **静的なWebサイトの場合**
 1. `package.json`に下記のように記述します。
-```
+```json
 {
   "scripts": {
     "build": "next build",
@@ -92,7 +92,7 @@ Next.jsを使用して本番運用するにあたって、静的なWebサイト�
 ```
 
 2. `next.config.js`にpathマップを記述します。
-```
+```js
 module.exports = {
   exportPathMap: () => ({
     '/': {page: '/'}
@@ -102,7 +102,7 @@ module.exports = {
 
 3. 動作テスト
 下記コマンドを実行しましょう
-```
+```bash
 npm run build
 npm run static
 ```
@@ -113,7 +113,7 @@ npm run static
 
 **動的なWebサイトの場合**
 1. `package.json`に下記のように記述します。
-```
+```json
 {
   "scripts": {
     "build": "next build",
@@ -123,7 +123,7 @@ npm run static
 ```
 
 2. 動作テスト
-```
+```bash
 npm run build
 npm run server
 ```
@@ -132,14 +132,14 @@ npm run server
 ## ルーティング
 Next.jsでURLに対応してページの出し分け(=ルーティング)を行いましょう。  
 まず、下記のように`index.js`とは別のページを用意しましょう。
-```
+```js
 // pages/another.js
 import React from "react";
 export default () => (<div>Another</div>)
 ```
 
 anotherページに遷移するリンクを`index.js`に記述しましょう。
-```
+```js
 // pages/index.js
 import React from "react";
 import Link from "next/link";
@@ -148,7 +148,7 @@ export default () => (<div><Link href="/another"><a>Another</a></Link></div>);
 
 `aタグ`ではなく`Link`を使用することで、ページ全体のリロードが発生せず差分レンダリングされるため、高速化が期待できます。
 さらなる高速化を行いたい場合、`Link`に`prefetch`を付与してください。
-```
+```html
 <Link prefetch>
 ```
 `Link`の中に`aタグ`を記述したのは、ページ遷移(`Link`)とスタイル(`aタグ`)という二つの役割を分離するためです。  
@@ -157,7 +157,7 @@ export default () => (<div><Link href="/another"><a>Another</a></Link></div>);
 続いて、2つのページで共通して使用するNavigationコンポーネントを作成し、ページ間の行き来をできるようにしましょう。
 
 1. 現在のURLに応じて文字の太さが変化するコンポーネントを作成
-```
+```js
 // components/Btn.js
 import React from "react";
 import {withRouter} from "next/router";
@@ -174,7 +174,7 @@ export default withRouter(Btn)
 ```
 
 2. `Navigation`コンポーネントの作成
-```
+```js
 // components/Navigation.js
 import React from "react";
 import Link from "next/link";
@@ -189,7 +189,7 @@ export default () => (
 ```
 
 3. 各ページにNavigationコンポーネントを設置します。
-```
+```js
 // pages/index.js
 import React from "react";
 import Navigation from "../components/Navigation";
@@ -203,7 +203,7 @@ export default () => (
 );
 ```
 
-```
+```js
 // pages/another.js
 import React from "react";
 import Navigation from "../components/Navigation";
@@ -226,7 +226,7 @@ export default () => (
 ここでは、ダイナミックルーティングについて学んでいきましょう。
 
 1. ダイナミックルーティングに使用するデータファイルを定義します
-```
+```js
 // data/posts.js
 export default [
   {title: 'Foo'},
@@ -236,7 +236,7 @@ export default [
 ```
 
 2. `index.js`に上記のページに対応する`Link`を記述します
-```
+```js
 // pages/index.js
 import React from "react";
 import Link from "next/link";
@@ -260,7 +260,7 @@ export default () => (
 Next.jsでは、Linkにオブジェクトを渡すことで、自動でStringに変換してくれます。
 
 3. `another.js`でページのタイトルを表示するようにします
-```
+```js
 // pages/another.js
 import React from "react";
 import Navigation from "../components/Navigation";
@@ -281,7 +281,7 @@ anotherページに`title`が表示されるはずです。
 
 4. `posts[id]`が未定義の場合はエラーページを表示するようにする
 `posts[id]`が未定義の場合、三項演算子を使ってシンプルにNext.jsが用意している`Error`コンポーネントを表示しましょう。
-```
+```js
 import React from "react";
 import Error from "next/error";
 import Navigation from "../components/Navigation";
@@ -305,7 +305,7 @@ export default ({url: {query: {id}}}) => (
 先ほどのようにクエリパラメータ(`localhost:3000/another?id=1`)でidを指定した場合、SEOフレンドリーではありません。
 そこで、idがURLの一部(`localhost:3000/another/1`)となるように実装してみましょう。  
 `Link`の`prop`として`as`を渡します。
-```
+```html
 <Link as={`/another/${index}`} href={{pathname: '/another, query: {id: index}}}>
   <a>{post.title}</a>
 </Link>
@@ -317,12 +317,12 @@ export default ({url: {query: {id}}}) => (
 そこで、expressをインストールしてこの問題を解決しましょう。
 
 1. `express`のインストール
-```
+```bash
 npm install --save-dev express
 ```
 
 2. `server.js`の作成
-```
+```js
 // server.js
 const express = require('express');
 const next = require('next');
@@ -355,7 +355,7 @@ app.prepare().then(() => {
 ```
 
 3. `package.json`の`start`を下記のように書き換えnodeサーバを起動
-```
+```json
 {
   "scripts": {
     "start": "node server.js"
@@ -365,7 +365,7 @@ app.prepare().then(() => {
 
 4. 動作テスト
 `npm start`し、`localhost:3000/another/1`にアクセスし、リロードしてみましょう。
-```
+```bash
 npm start
 ```
 正常にページが表示されるはずです。
@@ -376,13 +376,13 @@ Next.jsはルーティングをベースとして複数の`chunk`に分割する
 ここでは、必要なタイミングで動的に読み込みを行うダイナミックローディングについて説明します。
 
 1. `dynamic`のimport
-```
+```bash
 import dynamic from 'next/dynamic';
 ```
 
 2. 任意の場所でロードする
 下記のようにHogeコンポーネントをimportする際に、`dynamic`を呼びだすことで、Hogeコンポーネントが`render`されるまでロードされなくなります。
-```
+```js
 import dynamic from 'next/dynamic';
 
 const DynamicHoge = dynamic(import('../components/Hoge'))
@@ -399,7 +399,7 @@ export default class Page extends React.Component {
 ```
 
 3. ロードが完了するまで、ローディング表示する
-```
+```js
 const loading = () => <div>Loading...</div>;
 const DynamicHoge = dynamic(
   import('../components/Foo'),
@@ -408,7 +408,7 @@ const DynamicHoge = dynamic(
 ```
 
 4. 複数のコンポーネントを一度に読み込む
-```
+```js
 const Bundle = dynamic({
   modules: props => ({
     Foo: import('../components/Foo'),
@@ -432,7 +432,7 @@ export default () => ( <Bundle title="Dynamic Bundle"/> );
 著者のおすすめは、サードパーティ製の[`styled-components`](https://www.styled-components.com/ "styled-components")を使うことですが、ここでは`Next.js`で用意されている`JSS(CSS in JS)`の仕組みを紹介します。  
 下記のように`<style jsx></style>`で囲むことで直接cssを記述することができます。このようにして記述したCSSのスコープは記述したCSS内に限定されるため、CSSでありがちなクラス間の依存関係が複雑になりメンテナンスコストが高くなってしまうといった問題が起こりにくく、1ファイルにまとまるという利点があります。  
 ＊ `<style jsx global></style>`のように`global`を付与することで、グローバルスコープにすることも可能です。
-```
+```js
 // components/Btn.js
 import React from "react";
 import {withRouter} from "next/router";
@@ -465,12 +465,12 @@ export default withRouter(Btn)
 
 また、`Next.js`のバージョン5以上からWebpackローダープラグインの使用が可能になりました。
 1. プラグインのインストール
-```
+```bash
 npm install @zeit/next-css --save-dev
 ```
 
 2. `next.config.js`に下記を追記する
-```
+```js
 // next.config.js
 const withCss = require('@zeit/next-css');
 module.exports = withCss({});
@@ -478,7 +478,7 @@ module.exports = withCss({});
 
 3. カスタムドキュメントの追加
 ＊カスタムドキュメントについては2章で詳しく説明します。ここでは、`css`の部分に着目してください。
-```
+```js
 // pages/_document.js
 import Document, {Head, Main, NextScript} from 'next/document';
 
@@ -502,7 +502,7 @@ export default class MyDocument extends Document {
 
 4. CSSファイルのimport
 上記のようにすることで、`.css`ファイルを`.js`ファイルと同じようにインポートできるようになります。
-```
+```js
 // components/Navigation.js
 import React from "react";
 import Btn from "./Btn";
@@ -517,7 +517,7 @@ export default () => (
 );
 ```
 
-```
+```css
 // pages/Navigation.css
 nav {
   background-color: #fbfbfb;
@@ -532,7 +532,7 @@ nav {
 1. `static`ディレクトリーを作成し、`hoge.jpg`を格納する
 
 2. CSSのbackgroundに指定
-```
+```css
 // pages/Navigation.css
 .logo {
   background: url(/static/hoge.jpg) no-repeat center center;
@@ -541,23 +541,23 @@ nav {
 ```
 
 3. classをあてる
-```
+```html
 <span className="logo"/>
 ```
 
 ### コンポーネントに直接記述する
-```
+```html
 <span src="/static/hoge.jpg"/>
 ```
 
 ### `next-images`を使う
 1. `next-images`をインストール
-```
+```bash
 npm install --save-dev next-images
 ```
 
 2. `next.config.js`に下記を追記する
-```
+```js
 // next.config.js
 const withCss = require('@zeit/next-css');
 const withImages = require('next-images');
@@ -566,7 +566,7 @@ module.exports = withImages(withCss({}));
 
 3. 画像ファイルを`import`する
 下記のように画像ファイルを`import`することで、画像そのものではなくその`URL`をインポートすることができます。
-```
+```js
 import Image from '../static/hoge.js'
 
 <img src={Image} alt="hoge"/>
