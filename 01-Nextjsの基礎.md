@@ -303,4 +303,272 @@ export default ({url: {query: {id}}}) => (
 
 ## SEOフレンドリーなURL
 先ほどのようにクエリパラメータ(`localhost:3000/another?id=1`)でidを指定した場合、SEOフレンドリーではありません。
-そこで、idがURLの一部(`localhost:3000/another/1`)となるように実装してみましょう。
+そこで、idがURLの一部(`localhost:3000/another/1`)となるように実装してみましょう。  
+`Link`の`prop`として`as`を渡します。
+```
+<Link as={`/another/${index}`} href={{pathname: '/another, query: {id: index}}}>
+  <a>{post.title}</a>
+</Link>
+```
+
+`localhost:3000`にアクセスし、`Foo`, `Hoge`, `Bar`のいずれかのリンクをクリックすると、URLが`localhost:3000/another/1`のようになっていることを確認できます。  
+しかし、このままの状態では一点問題があります。それはリロードした時です。リロードすると`404 Page Not Found`のエラーが発生します。
+これは、URLのマスキングがクライアントサイドで行われており、サーバサイドでは`localhost:3000/another/1`のようなURLにアクセスした時に、どのページを表示すれば良いかわからないからです。
+そこで、expressをインストールしてこの問題を解決しましょう。
+
+1. `express`のインストール
+```
+npm install --save-dev express
+```
+
+2. `server.js`の作成
+```
+// server.js
+const express = require('express');
+const next = require('next');
+
+const port = 3000;
+const dev = process.env.NODE_ENV !== 'production';
+const app = next({dev});
+const handle = app.getRequestHandler();
+const server = express();
+
+server.get('/another/:id', (req, res) => {
+  const actualPage = '/another';
+  const queryParams = {id: req.params.id};
+  app.render(req, res, actualPage, queryParams);
+});
+
+server.get('*', (req, res) => {
+  return handle(req, res)
+})
+
+app.prepare().then(() => {
+  server.listen(port, (err) => {
+    if(err) throw err
+    console.log('NextJS is ready on https://localhost:' + port);
+  });
+}).catch(e => {
+  console.error(e.stack);
+  process.exit(1);
+});
+```
+
+3. `package.json`の`start`を下記のように書き換えnodeサーバを起動
+```
+{
+  "scripts": {
+    "start": "node server.js"
+  }
+}
+```
+
+4. 動作テスト
+`npm start`し、`localhost:3000/another/1`にアクセスし、リロードしてみましょう。
+```
+npm start
+```
+正常にページが表示されるはずです。
+
+
+## ダイナミックローディング
+Next.jsはルーティングをベースとして複数の`chunk`に分割する`Code Splitting`に対応していますが、それだけでは十分とは言えません。
+ここでは、必要なタイミングで動的に読み込みを行うダイナミックローディングについて説明します。
+
+1. `dynamic`のimport
+```
+import dynamic from 'next/dynamic';
+```
+
+2. 任意の場所でロードする
+下記のようにHogeコンポーネントをimportする際に、`dynamic`を呼びだすことで、Hogeコンポーネントが`render`されるまでロードされなくなります。
+```
+import dynamic from 'next/dynamic';
+
+const DynamicHoge = dynamic(import('../components/Hoge'))
+
+export default class Page extends React.Component {
+  state = {show: false};
+  show = () => this.setState({show: true});
+  render() {
+    return (
+	  this.state.show ? <DynamicHoge/> : <button onClick={this.show}>Show!</button>
+	);
+  }
+}
+```
+
+3. ロードが完了するまで、ローディング表示する
+```
+const loading = () => <div>Loading...</div>;
+const DynamicHoge = dynamic(
+  import('../components/Foo'),
+  {loading}
+);
+```
+
+4. 複数のコンポーネントを一度に読み込む
+```
+const Bundle = dynamic({
+  modules: props => ({
+    Foo: import('../components/Foo'),
+    Bar: import('../components/Hoge')
+  }),
+  render: (props, {Foo, Bar}) => (
+    <div>
+	  <h1>{props.title}</h1>
+	  <Foo/>
+	  <Bar/>
+	</div>
+  )
+});
+
+export default () => ( <Bundle title="Dynamic Bundle"/> );
+```
+
+
+## CSS in JS
+コンポーネントにstyleをあてる方法はいろいろあります。  
+著者のおすすめは、サードパーティ製の[`styled-components`](https://www.styled-components.com/ "styled-components")を使うことですが、ここでは`Next.js`で用意されている`JSS(CSS in JS)`の仕組みを紹介します。  
+下記のように`<style jsx></style>`で囲むことで直接cssを記述することができます。このようにして記述したCSSのスコープは記述したCSS内に限定されるため、CSSでありがちなクラス間の依存関係が複雑になりメンテナンスコストが高くなってしまうといった問題が起こりにくく、1ファイルにまとまるという利点があります。  
+＊ `<style jsx global></style>`のように`global`を付与することで、グローバルスコープにすることも可能です。
+```
+// components/Btn.js
+import React from "react";
+import {withRouter} from "next/router";
+
+const Btn = ({href, onClick, children, router}) => (
+  <span>
+    <button onClick={onClick} className={router.pathname === href ? 'selected' : ''}>
+      { children }
+    </button>
+    <style jsx>{`
+      button {
+        color: blue;
+        border: solid 1px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        color: red;
+      }
+
+      button.selected {
+        font-weight: bold;
+      }
+    `}</style>
+  </span>
+);
+
+export default withRouter(Btn)
+```
+
+また、`Next.js`のバージョン5以上からWebpackローダープラグインの使用が可能になりました。
+1. プラグインのインストール
+```
+npm install @zeit/next-css --save-dev
+```
+
+2. `next.config.js`に下記を追記する
+```
+// next.config.js
+const withCss = require('@zeit/next-css');
+module.exports = withCss({});
+```
+
+3. カスタムドキュメントの追加
+```
+// pages/_document.js
+import Document, {Head, Main, NextScript} from 'next/document';
+
+export default class MyDocument extends Document {
+  render() {
+    return (
+      <html>
+        <Head>
+          <link rel="stylesheet" href="/_next/static/style.css"/>
+          <title>NextJS</title>
+        </Head>
+        <body>
+          <Main/>
+          <NextScript/>
+        </body>
+      </html>
+    )
+  }
+}
+```
+
+4. CSSファイルのimport
+上記のようにすることで、`.css`ファイルを`.js`ファイルと同じようにインポートできるようになります。
+```
+// components/Navigation.js
+import React from "react";
+import Btn from "./Btn";
+import Link from "next/link";
+import './Navigation.css';
+
+export default () => (
+  <nav>
+    <Link href="/" passHref><Btn>Index</Btn></Link>
+	<Link href="/another" passHref><Btn>Another</Btn></Link>
+  </nav>
+);
+```
+
+```
+// pages/Navigation.css
+nav {
+  background-color: #fbfbfb;
+}
+```
+
+
+## 画像を表示する
+画像を表示する方法もいろいろあります。ここでは3種類紹介します。
+
+### CSSの`background`に指定
+1. `static`ディレクトリーを作成し、`hoge.jpg`を格納する
+
+2. CSSのbackgroundに指定
+```
+// pages/Navigation.css
+.logo {
+  background: url(/static/hoge.jpg) no-repeat center center;
+  background-size: cover;
+}
+```
+
+3. classをあてる
+```
+<span className="logo"/>
+```
+
+### コンポーネントに直接記述する
+```
+<span src="/static/hoge.jpg"/>
+```
+
+### `next-images`を使う
+1. `next-images`をインストール
+```
+npm install --save-dev next-images
+```
+
+2. `next.config.js`に下記を追記する
+```
+// next.config.js
+const withCss = require('@zeit/next-css');
+const withImages = require('next-images');
+module.exports = withImages(withCss({}));
+```
+
+3. 画像ファイルを`import`する
+下記のように画像ファイルを`import`することで、画像そのものではなくその`URL`をインポートすることができます。
+```
+import Image from '../static/hoge.js'
+
+<img src={Image} alt="hoge"/>
+```
+
+次の章ではコンフィグについて学んでいきます。
