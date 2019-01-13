@@ -172,7 +172,7 @@ export default withRedux(makeStore)(MyApp);
 ```
 
 3. 各コンポーネントではシンプルに`connect`することができる
-```
+```js
 // pages/index.js
 import React, {Component} from "react";
 import {connect} from "react-redux";
